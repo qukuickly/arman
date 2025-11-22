@@ -1,1 +1,162 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bet History</title>
+
+<style>
+body{
+    margin:0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:#080b12;
+    color:white;
+    padding:90px 14px 40px;
+}
+
+/* TOP BAR */
+.killer-top-bar{
+  position: fixed;top: 14px;left: 50%;transform: translateX(-50%);
+  width: calc(100% - 32px);max-width: 760px;height: 62px;
+  background: linear-gradient(180deg, rgba(10,12,20,0.85), rgba(12,14,24,0.6));
+  border-radius: 16px;border: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px) saturate(120%);
+  display: flex;align-items: center;justify-content: space-between;
+  padding: 0 14px;box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+  z-index: 9999999;
+}
+.brand-box{display: flex;align-items:center;gap:8px;}
+.brand-img{width:115px;filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));}
+.pro-badge{background:linear-gradient(90deg,#ff006a,#ff7e00);padding:3px 10px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;}
+.user-name{position:absolute;left:50%;transform:translateX(-50%);font-size:15px;font-weight:700;color:#fff;text-transform:capitalize;}
+.wallet-btn{
+  background:linear-gradient(90deg,rgba(0,255,209,0.22),rgba(122,95,255,0.22));
+  padding:8px 14px;border-radius:12px;font-size:14px;font-weight:700;
+  border:1px solid rgba(255,255,255,0.1);color:#fff;
+}
+
+/* MAIN HEADING */
+h2{
+    text-align:center;
+    margin:20px 0 10px;
+    opacity:.9;
+}
+
+/* HISTORY BOX */
+.history-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.item{
+    background:#0e141e;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.07);
+}
+.item-title{
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:6px;
+}
+.item-team{
+    opacity:.85;
+    margin-bottom:6px;
+}
+.item-time{
+    font-size:13px;
+    opacity:.6;
+}
+
+.empty{
+    text-align:center;
+    opacity:.7;
+    margin-top:40px;
+    font-size:15px;
+}
+
+.clear-btn{
+    margin-top:18px;
+    width:100%;
+    padding:12px;
+    border:0;
+    border-radius:10px;
+    background:rgba(255,50,50,0.25);
+    border:1px solid rgba(255,50,50,0.4);
+    color:#ff7777;
+    font-weight:700;
+    cursor:pointer;
+}
+.clear-btn:active{transform:scale(.96);}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="killer-top-bar">
+  <div class="brand-box">
+    <img src="https://d13ir53smqqeyp.cloudfront.net/d11-static-pages/images/dream11LogoWhite.webp" class="brand-img">
+    <span class="pro-badge">PRO</span>
+  </div>
+
+  <span id="userName" class="user-name"></span>
+
+  <button id="walletBtn" class="wallet-btn">₹0</button>
+</div>
+
+<h2>Your Bet History</h2>
+
+<div id="historyBox" class="history-list"></div>
+
+<button class="clear-btn" onclick="clearHistory()">Clear Bet History</button>
+
+<script>
+function loadUser(){
+  const uname = localStorage.getItem("APP_USER") || "Guest";
+  const bal = Number(localStorage.getItem("APP_BALANCE") || 0);
+
+  document.getElementById("userName").innerText = uname;
+  document.getElementById("walletBtn").innerText = "₹" + bal;
+}
+loadUser();
+
+// LOAD HISTORY
+function loadHistory(){
+    let list = JSON.parse(localStorage.getItem("BET_HISTORY") || "[]");
+    const box = document.getElementById("historyBox");
+
+    if(list.length === 0){
+        box.innerHTML = `<p class="empty">No bets placed yet.</p>`;
+        return;
+    }
+
+    // Latest first
+    list.reverse();
+
+    list.forEach(b=>{
+        let div = document.createElement("div");
+        div.className = "item";
+
+        div.innerHTML = `
+            <div class="item-title">Bet: ₹${b.amount}</div>
+            <div class="item-team">${b.team}</div>
+            <div class="item-time">${b.time}</div>
+        `;
+        box.appendChild(div);
+    });
+}
+
+loadHistory();
+
+// CLEAR HISTORY
+function clearHistory(){
+    if(confirm("Delete all bet records?")){
+        localStorage.removeItem("BET_HISTORY");
+        location.reload();
+    }
+}
+</script>
+
+</body>
+</html>
